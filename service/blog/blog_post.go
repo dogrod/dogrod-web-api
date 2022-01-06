@@ -1,7 +1,7 @@
 package blog
 
 import (
-	blog_post "dogrod-web-service/model/blog"
+	"dogrod-web-service/model/blog"
 	"errors"
 	"net/http"
 
@@ -23,12 +23,12 @@ func (blogPostService *BlogPostService) ConnectDatabase() *gorm.DB {
 
 // initialize db
 func (blogPostService *BlogPostService) InitDatabase() {
-	blogPostService.ConnectDatabase().AutoMigrate(&blog_post.BlogPost{})
+	blogPostService.ConnectDatabase().AutoMigrate(&blog.BlogPost{})
 }
 
 // create blog post
 func (blogPostService *BlogPostService) AddBlogPost(c *gin.Context) {
-	var newPost blog_post.BlogPost
+	var newPost blog.BlogPost
 
 	if err := c.BindJSON(&newPost); err != nil {
 		panic("An error occurred when parse request data")
@@ -41,7 +41,7 @@ func (blogPostService *BlogPostService) AddBlogPost(c *gin.Context) {
 
 // retrieve all blog posts
 func (blogPostService *BlogPostService) GetBlogPosts(c *gin.Context) {
-	var posts []blog_post.BlogPost
+	var posts []blog.BlogPost
 
 	result := blogPostService.ConnectDatabase().Find(&posts)
 
@@ -54,7 +54,7 @@ func (blogPostService *BlogPostService) GetBlogPosts(c *gin.Context) {
 
 // retrieve blog post via post slug
 func (blogPostService *BlogPostService) GetBlogPostBySlug(c *gin.Context) {
-	var post blog_post.BlogPost
+	var post blog.BlogPost
 
 	slug := c.Param("slug")
 
