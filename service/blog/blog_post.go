@@ -34,7 +34,20 @@ func (blogPostService *BlogPostService) AddBlogPost(c *gin.Context) {
 		panic("An error occurred when parse request data")
 	}
 
-	blogPostService.ConnectDatabase().Create(&newPost)
+	// TODO prevent duplicate slug
+	db := blogPostService.ConnectDatabase()
+
+	var duplicatePost blog.BlogPost
+
+	db.Where("slug = ?", newPost.Slug).First(&duplicatePost)
+
+	if duplicatePost.ID != 0 {
+		// panic("slug already exist")
+		c.IndentedJSON(http.StatusConflict, gin.H{"message": "slug already exist"})
+		return
+	}
+
+	db.Create(&newPost)
 
 	c.IndentedJSON(http.StatusOK, newPost)
 }
