@@ -1,29 +1,20 @@
 package blog
 
 import (
+	"dogrod-web-service/global"
 	"dogrod-web-service/model/blog"
 	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
 type BlogPostService struct{}
 
-func (blogPostService *BlogPostService) ConnectDatabase() *gorm.DB {
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database")
-	}
-
-	return db
-}
-
 // initialize db
 func (blogPostService *BlogPostService) InitDatabase() {
-	blogPostService.ConnectDatabase().AutoMigrate(&blog.BlogPost{})
+	global.ConnectDatabase().AutoMigrate(&blog.BlogPost{})
 }
 
 // create blog post
@@ -35,7 +26,7 @@ func (blogPostService *BlogPostService) AddBlogPost(c *gin.Context) {
 	}
 
 	// TODO prevent duplicate slug
-	db := blogPostService.ConnectDatabase()
+	db := global.ConnectDatabase()
 
 	var duplicatePost blog.BlogPost
 
@@ -56,7 +47,7 @@ func (blogPostService *BlogPostService) AddBlogPost(c *gin.Context) {
 func (blogPostService *BlogPostService) GetBlogPosts(c *gin.Context) {
 	var posts []blog.BlogPost
 
-	result := blogPostService.ConnectDatabase().Find(&posts)
+	result := global.ConnectDatabase().Find(&posts)
 
 	if result.Error != nil {
 		panic("failed to query blog posts")
@@ -71,7 +62,7 @@ func (blogPostService *BlogPostService) GetBlogPostBySlug(c *gin.Context) {
 
 	slug := c.Param("slug")
 
-	db := blogPostService.ConnectDatabase()
+	db := global.ConnectDatabase()
 
 	err := db.Where("slug = ?", slug).First(&post).Error
 
