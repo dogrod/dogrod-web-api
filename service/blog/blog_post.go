@@ -18,29 +18,27 @@ func (blogPostService *BlogPostService) InitDatabase() {
 }
 
 // create blog post
-func (blogPostService *BlogPostService) AddBlogPost(c *gin.Context) {
-	var newPost blog.BlogPost
+func (blogPostService *BlogPostService) CreateBlogPost(newPost blog.BlogPost) (err error) {
+	// var newPost blog.BlogPost
 
-	if err := c.BindJSON(&newPost); err != nil {
-		panic("An error occurred when parse request data")
-	}
+	// if err := c.BindJSON(&newPost); err != nil {
+	// 	panic("An error occurred when parse request data")
+	// }
 
 	// TODO prevent duplicate slug
 	db := global.ConnectDatabase()
 
 	var duplicatePost blog.BlogPost
 
-	db.Where("slug = ?", newPost.Slug).First(&duplicatePost)
+	dupErr := db.Where("slug = ?", newPost.Slug).First(&duplicatePost).Error
 
-	if duplicatePost.ID != 0 {
-		// panic("slug already exist")
-		c.IndentedJSON(http.StatusConflict, gin.H{"message": "slug already exist"})
-		return
+	if !errors.Is(dupErr, gorm.ErrRecordNotFound) {
+		err = errors.New("slug already exist")
+	} else {
+		err = db.Create(&newPost).Error
 	}
 
-	db.Create(&newPost)
-
-	c.IndentedJSON(http.StatusOK, newPost)
+	return err
 }
 
 // retrieve all blog posts
