@@ -4,9 +4,8 @@ import (
 	"dogrod-web-service/global"
 	"dogrod-web-service/model/blog"
 	"errors"
-	"net/http"
+	"fmt"
 
-	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
@@ -33,7 +32,7 @@ func (blogPostService *BlogPostService) CreateBlogPost(newPost blog.BlogPost) (e
 	dupErr := db.Where("slug = ?", newPost.Slug).First(&duplicatePost).Error
 
 	if !errors.Is(dupErr, gorm.ErrRecordNotFound) {
-		err = errors.New("slug already exist")
+		err = fmt.Errorf("slug already exist")
 	} else {
 		err = db.Create(&newPost).Error
 	}
@@ -42,32 +41,26 @@ func (blogPostService *BlogPostService) CreateBlogPost(newPost blog.BlogPost) (e
 }
 
 // retrieve all blog posts
-func (blogPostService *BlogPostService) GetBlogPosts(c *gin.Context) {
+func (blogPostService *BlogPostService) GetBlogPosts() (err error, list []blog.BlogPost) {
 	var posts []blog.BlogPost
-
-	result := global.ConnectDatabase().Find(&posts)
-
-	if result.Error != nil {
-		panic("failed to query blog posts")
-	}
-
-	c.IndentedJSON(http.StatusOK, posts)
-}
-
-// retrieve blog post via post slug
-func (blogPostService *BlogPostService) GetBlogPostBySlug(c *gin.Context) {
-	var post blog.BlogPost
-
-	slug := c.Param("slug")
 
 	db := global.ConnectDatabase()
 
-	err := db.Where("slug = ?", slug).First(&post).Error
+	err = db.Find(&posts).Error
 
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "post not found"})
-		return
-	}
+	return err, posts
+}
 
-	c.IndentedJSON(http.StatusOK, post)
+// retrieve blog post via post slug
+func (blogPostService *BlogPostService) GetBlogPostBySlug(slug string) (err error, post blog.BlogPost) {
+	db := global.ConnectDatabase()
+
+	err = db.Where("slug = ?", slug).First(&post).Error
+
+	// if errors.Is(err, gorm.ErrRecordNotFound) {
+	// 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "post not found"})
+	// 	return
+	// }
+
+	return err, post
 }
