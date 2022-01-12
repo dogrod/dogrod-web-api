@@ -31,7 +31,7 @@ func (blogPostController *BlogPostController) GetBlogPosts(c *gin.Context) {
 	err, posts := blogPostService.GetBlogPosts()
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "No post found"})
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Post not found"})
 	} else if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Internal error"})
 	} else {
@@ -46,7 +46,7 @@ func (blogPostController *BlogPostController) GetBlogPostBySlug(c *gin.Context) 
 	err, post := blogPostService.GetBlogPostBySlug(slug)
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "No post found"})
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Post not found"})
 	} else if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Internal error"})
 	} else {

@@ -18,12 +18,6 @@ func (blogPostService *BlogPostService) InitDatabase() {
 
 // create blog post
 func (blogPostService *BlogPostService) CreateBlogPost(newPost blog.BlogPost) (err error) {
-	// var newPost blog.BlogPost
-
-	// if err := c.BindJSON(&newPost); err != nil {
-	// 	panic("An error occurred when parse request data")
-	// }
-
 	// TODO prevent duplicate slug
 	db := global.ConnectDatabase()
 
@@ -56,11 +50,6 @@ func (blogPostService *BlogPostService) GetBlogPostBySlug(slug string) (err erro
 	db := global.ConnectDatabase()
 
 	err = db.Where("slug = ?", slug).First(&post).Error
-
-	// if errors.Is(err, gorm.ErrRecordNotFound) {
-	// 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "post not found"})
-	// 	return
-	// }
 
 	return err, post
 }
