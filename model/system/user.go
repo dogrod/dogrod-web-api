@@ -1,11 +1,11 @@
-package user
+package system
 
 import (
 	"database/sql"
 	"dogrod-web-service/global"
 )
 
-type UserBase struct {
+type SystemUser struct {
 	global.BaseModel
 	Username    string       `json:"username" gorm:"comment:unique user name"`
 	Email       string       `json:"email" gorm:"email"`
