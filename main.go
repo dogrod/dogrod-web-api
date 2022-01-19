@@ -15,6 +15,9 @@ func main() {
 	blogCategoryService := service.ServiceGroupApp.BlogServiceGroup.BlogCategoryService
 	blogCategoryService.InitDatabase()
 
+	blogTagService := service.ServiceGroupApp.BlogServiceGroup.BlogTagService
+	blogTagService.InitDatabase()
+
 	// Init routers
 	Router := gin.Default()
 	RouterGroup := Router.Group("")
