@@ -1,12 +1,13 @@
 package global
 
 import (
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
 func ConnectDatabase() *gorm.DB {
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	dsn := "dev_dogrod_com:fut@rfe4FWT_fuy0jun@tcp(sh-cdb-lldgzazy.sql.tencentcdb.com:59717)/dev_dogrod_com"
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}

@@ -1,0 +1,40 @@
+name: Deploy application to Microsoft Azure Functions
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - releases/*
+    paths-ignore:
+      - "**.md"
+  pull_request:
+    paths-ignore:
+      - "**.md"
+
+env:
+  AZURE_FUNCTIONAPP_NAME: dogrod-web-service
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: "."
+  GO_LANG_VERSION: "1.18"
+
+jobs:
+  run:
+    name: Deploy to Azure Functions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout GitHub action
+        uses: actions/checkout@v3
+      - name: 'Setup Go ${{ env.GO_LANG_VERSION }} Environment'
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ env.GO_LANG_VERSION }}
+      - name: Build application
+        run: GOOS=linux GOARCH=amd64 go build handler.go
+      - name: "Run Azure Functions action"
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+          # Set to true to enable verbose logging
+          # verbose: false
